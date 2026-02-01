@@ -9,7 +9,7 @@ const LOG_DEBUG = true;
  *  Turn console output on or off. Best used with environment variables.
  * @returns {(...args: any[]) => void}
  * @author Benjamin P.C. Hovinga
- * @copyright MIT License
+ * @license MIT
  */
 function createLogger(logLevel = "log", enabled = true) {
     // Define console colors for each log level
