@@ -29,11 +29,11 @@ function showPersona(user) {
     }
     document.getElementById('persona-photo').src = user?.picture?.large;
 
-    // Open the model
+    // Open the persona-modal
     const modal = document.getElementById('persona-modal');
     modal.setAttribute('open', true);
 
-    // Close when button clicked
+    // Close the persona-modal when button clicked
     modal.querySelector('button[rel="prev"]').addEventListener('click', (ev) =>{
         const dialog = ev.target.closest('dialog');
         dialog.removeAttribute('open');
