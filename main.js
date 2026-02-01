@@ -1,13 +1,43 @@
-const DEBUG = true;
+const LOG_DEBUG = true;
 
 /**
- * Helper function to output debug messages to the console.
- * @param  {...any} args 
- * @returns {void}
+ * Closure that creates a reusable logger function.
+ * 
+ * @param {"log" | "error" | "warn" | "info" | "debug"} logLevel 
+ *  Log level available on the `console` object.
+ * @param {boolean} enabled 
+ *  Turn console output on or off. Best used with environment variables.
+ * @returns {(...args: any[]) => void}
+ * @author Benjamin P.C. Hovinga
+ * @copyright MIT License
  */
-function debug(...args) {
-    if (DEBUG) console.debug("[DEBUG]", ...args);
+function createLogger(logLevel = "log", enabled = true) {
+    // Define console colors for each log level
+    const colors = {
+        "log": "\x1b[30m", // BLACK
+        "error": "\x1b[31m", // RED
+        "warn": "\x1b[33m", // YELLOW
+        "info": "\x1b[36m", // CYAN
+        "debug": "\x1b[35m" // MAGENTA
+    };
+    const reset = "\x1b[0m";  // RESET COLOR
+
+    // Validate logLevel
+    if (!colors.hasOwnProperty(logLevel))
+        throw TypeError(`${logLevel} is not a valid logLevel.`);
+
+    // Build prefix string
+    const prefix = `${colors[logLevel]}[${logLevel.toUpperCase()}]${reset}`;
+
+    // Return logger function
+    return function (...args) {
+        if (enabled) console[logLevel](prefix, ...args);
+    }
 }
+
+const debug = createLogger("debug", LOG_DEBUG);
+const info = createLogger("info");
+const error = createLogger("error");
 
 
 function showPersona(user) {
@@ -88,8 +118,8 @@ document.getElementById("submit-btn").addEventListener('click', async (ev) => {
 
         // Display the persona on screen
         showPersona(data.results[0]);
-    } catch (error) {
-        console.error('There was an error when attempting to fetch from the api.', error);
+    } catch (err) {
+        error('There was an error when attempting to fetch from the api.\n', err);
     } finally {
         // Unlock the button
         button.removeAttribute('disabled');
