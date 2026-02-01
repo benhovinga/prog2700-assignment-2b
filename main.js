@@ -64,16 +64,17 @@ function showPersona(user) {
     modal.setAttribute('open', true);
 
     // Close the persona-modal when button clicked
-    modal.querySelector('button[rel="prev"]').addEventListener('click', (ev) =>{
-        const dialog = ev.target.closest('dialog');
+    modal.querySelector('button[rel="prev"]').addEventListener('click', (event) =>{
+        const dialog = event.target.closest('dialog');
         dialog.removeAttribute('open');
     });
 }
 
 // Generate button was clicked
-document.getElementById("submit-btn").addEventListener('click', async (ev) => {
-    ev.preventDefault();
-    const button = ev.target
+document.getElementById("submit-btn").addEventListener('click', async (event) => {
+    info("Generate button was clicked.")
+    event.preventDefault();
+    const button = event.target
     
     // Lock out button
     const backupText = button.innerText
