@@ -41,9 +41,21 @@ const info = createLogger("info");
 const error = createLogger("error");
 
 
-function displayPersona(user) {
+function preloadImage(url) {
+    return new Promise((resolve, reject) => {
+        info("Preloading the image.")
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+        img.src = url;
+    });
+}
+
+
+async function displayPersona(user) {
     debug("user:", user);
 
+    // Assign selected user data to persona details
     const personaDetails = {
         photo: user?.picture?.large,
         name: `${user?.name?.first} ${user?.name?.last}`,
@@ -55,7 +67,7 @@ function displayPersona(user) {
     };
     debug("personaDetails:", personaDetails);
 
-    // Update the persona-* elements
+    // Update the persona elements
     for(const key in personaDetails) {
         const element = document.getElementById(`persona-${key}`);
         if (element) {
@@ -64,6 +76,9 @@ function displayPersona(user) {
             else element.innerText = personaDetails[key];
         };
     }
+
+    // Wait for the browser to load the photo before opening the modal
+    await preloadImage(personaDetails.photo);
 
     // Open the persona-modal
     const modal = document.getElementById('persona-modal');
@@ -120,7 +135,7 @@ document.getElementById("submit-btn").addEventListener('click', (event) => {
             // Perform basic data validation on the json object
             if (json.hasOwnProperty('error')) throw new Error("API Error: " + json.error);
             if (!json.hasOwnProperty('results')) throw new Error("Received malformed response from API.");
-            displayPersona(json.results[0]);
+            return displayPersona(json.results[0]);
         })
         .catch((err) => {
             error(err);
