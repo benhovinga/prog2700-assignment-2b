@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Persona Generator</title>
+    <meta name="author" content="Benjamin P.C. Hovinga">
+    <link rel="stylesheet" href="pico.min.css">
+    <style>
+        .center {
+            margin-left: auto;
+            margin-right: auto;
+            width: fit-content;
+        }
+        article > header > h4 {
+            margin-bottom: 0;
+        }
+        #persona-modal > article {
+            max-width: 400px;
+        }
+
+        #persona > img {
+            width: 128px;
+            height: 128px;
+            display: block;
+            margin: 0 auto 1rem;
+        }
+    </style>
+</head>
+<body>
+    <header class="container">
+        <hgroup>
+            <h1>Simple Persona Generator</h1>
+            <p>An example of fetching data from an API.</p>
+        </hgroup>
+    </header>
+
+    <main class="container">
+        <article>
+            <header><h4>Options</h4></header>
+            <form>
+                <fieldset>
+                    <legend><strong>Gender:</strong></legend>
+                    <input type="radio" name="gender" id="gender-any" value="any" checked />
+                    <label for="gender-any">
+                        Any (default)
+                    </label>
+                    <input type="radio" name="gender" id="gender-female" value="female" />
+                    <label for="gender-female">
+                        Female
+                    </label>
+                    <input type="radio" name="gender" id="gender-male" value="male" />
+                    <label for="gender-male">
+                        Male
+                    </label>
+                </fieldset>
+                
+                <fieldset>
+                    <legend><strong>Nationality:</strong></legend>
+                    <select name="nationality" id="nationality">
+                        <option selected value="any">Any (default)</option>
+                        <option disabled>-----------------</option>
+                        <option value="au">Australia</option>
+                        <option value="br">Brazil</option>
+                        <option value="ca">Canada</option>
+                        <option value="dk">Denmark</option>
+                        <option value="fi">Finland</option>
+                        <option value="fr">France</option>
+                        <option value="de">Germany</option>
+                        <option value="ch">Switzerland</option>
+                        <option value="in">India</option>
+                        <option value="ir">Iran</option>
+                        <option value="ie">Ireland</option>
+                        <option value="mx">Mexico</option>
+                        <option value="nl">Netherlands</option>
+                        <option value="nz">New Zealand</option>
+                        <option value="no">Norway</option>
+                        <option value="rs">Serbia</option>
+                        <option value="es">Spain</option>
+                        <option value="tr">Turkey</option>
+                        <option value="ua">Ukraine</option>
+                        <option value="gb">United Kingdom</option>
+                        <option value="us">United States</option>
+                    </select>
+                </fieldset>
+                <button type="submit" id="submit-btn" >Generate</button>
+            </form>
+        </article>
+
+        <dialog id="persona-modal">
+            <article>
+                <header>
+                    <button aria-label="Close" rel="prev"></button>
+                    <p><strong>Meet your new persona!</strong></p>
+                </header>
+                <div id="persona">
+                    <img id="persona-photo" alt="Persona photo" />
+                    <p class="center"><strong><span id="persona-name">{{name}}</span></strong></p>
+                    <p>You are a <strong><span id="persona-age">{{age}}</span></strong> year old <strong><span id="persona-gender">{{gender}}</span></strong> from <strong><span id="persona-state">{{state}}</span>, <span id="persona-country">{{country}}</span></strong>.</p>
+                    <p></p>
+                </div>
+            </article>
+        </dialog>
+    </main>
+
+    <footer class="container">
+        <p><small>Thanks to Keith Armstrong and Arron Hunt for creating the <a rel="nofollow" href="https://randomuser.me/">Random User Generator</a> API.</small></p>
+        <p><small>Copyright &COPY; 2026 <a rel="author" href="https://ben.hovinga.ca/">Benjamin P.C. Hovinga</a>.</small></p>
+    </footer>
+
+    <script src="main.js"></script>
+</body>
+</html>
