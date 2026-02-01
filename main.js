@@ -1,10 +1,10 @@
 const LOG_DEBUG = true;
 
 /**
- * Closure that creates a reusable logger function.
+ * Creates a console logging function with log level highlighting.
  * 
  * @param {"log" | "error" | "warn" | "info" | "debug"} logLevel 
- *  Log level available on the `console` object.
+ *  Log levels available on the `console` object.
  * @param {boolean} enabled 
  *  Turn console output on or off. Best used with environment variables.
  * @returns {(...args: any[]) => void}
@@ -18,7 +18,7 @@ function createLogger(logLevel = "log", enabled = true) {
         "error": "\x1b[31m", // RED
         "warn": "\x1b[33m", // YELLOW
         "info": "\x1b[36m", // CYAN
-        "debug": "\x1b[35m" // MAGENTA
+        "debug": "\x1b[35m", // MAGENTA
     };
     const reset = "\x1b[0m";  // RESET COLOR
 
@@ -35,49 +35,57 @@ function createLogger(logLevel = "log", enabled = true) {
     }
 }
 
+// Create console loggers
 const debug = createLogger("debug", LOG_DEBUG);
 const info = createLogger("info");
 const error = createLogger("error");
 
 
-function showPersona(user) {
+function displayPersona(user) {
     debug("user:", user);
 
     const personaDetails = {
+        photo: user?.picture?.large,
         name: `${user?.name?.first} ${user?.name?.last}`,
         age: user?.dob?.age,
         gender: user?.gender,
+        city: user?.location?.city,
         state: user?.location?.state,
-        country: user?.location?.country
+        country: user?.location?.country,
     };
-
     debug("personaDetails:", personaDetails);
 
-    // Update the persona elements
+    // Update the persona-* elements
     for(const key in personaDetails) {
-        document.getElementById(`persona-${key}`).innerText = personaDetails[key];
+        const element = document.getElementById(`persona-${key}`);
+        if (element) {
+            debug(`element[${key}]`, element);
+            if (element.tagName === 'IMG') element.src = personaDetails[key];
+            else element.innerText = personaDetails[key];
+        };
     }
-    document.getElementById('persona-photo').src = user?.picture?.large;
 
     // Open the persona-modal
     const modal = document.getElementById('persona-modal');
     modal.setAttribute('open', true);
+    info("Persona modal was opened.");
 
     // Close the persona-modal when button clicked
-    modal.querySelector('button[rel="prev"]').addEventListener('click', (event) =>{
+    modal.querySelector('button[rel="prev"]').addEventListener('click', (event) => {
         const dialog = event.target.closest('dialog');
         dialog.removeAttribute('open');
+        info("User closed persona modal.");
     });
 }
 
 // Generate button was clicked
-document.getElementById("submit-btn").addEventListener('click', async (event) => {
-    info("Generate button was clicked.")
+document.getElementById("submit-btn").addEventListener('click', (event) => {
+    info("User clicked Generate button.");
     event.preventDefault();
-    const button = event.target
+    const button = event.target;
     
     // Lock out button
-    const backupText = button.innerText
+    const backupText = button.innerText;
     button.setAttribute('disabled', true);
     button.innerText = "Please wait...";
     button.ariaBusy = true;
@@ -89,42 +97,38 @@ document.getElementById("submit-btn").addEventListener('click', async (event) =>
     // Parse the gender field
     const gender = document.querySelector('input[name="gender"]:checked').value;
     if (gender !== "any") requestURL.searchParams.set("gender", gender);
-
     debug("gender:", gender);
 
     // Parse the nationality field
     const nationality = document.querySelector('select[name="nationality"]')?.value;
     if (nationality !== "any") requestURL.searchParams.set("nat", nationality);
-
     debug("nationality: ", nationality);
 
+    // Make the request to the API
+    info("Making a request to the API.");
     debug("requestURL:", requestURL);
-
-    try {
-        // Fetch the data from the API
-        const response = await fetch(requestURL);
-
-        debug("response:", response);
-
-        // Basic response validation
-        if (!response.ok) throw new Error("HTTP status: " + response.status);
-
-        // Convert it to JSON
-        const data = await response.json();
-        debug("data:", data);
-
-        // Basic data validation
-        if (data.hasOwnProperty('error')) throw new Error("API Error: " + data.error);
-        if (!data.hasOwnProperty('results')) throw new Error("Received malformed response from API.");
-
-        // Display the persona on screen
-        showPersona(data.results[0]);
-    } catch (err) {
-        error('There was an error when attempting to fetch from the api.\n', err);
-    } finally {
-        // Unlock the button
-        button.removeAttribute('disabled');
-        button.innerText = backupText;
-        button.ariaBusy = false;
-    }
+    fetch(requestURL)
+        .then((response) => {
+            debug("response:", response);
+            // Check if the response was ok
+            if (!response.ok) throw new Error("HTTP status: " + response.status);
+            info("The API request was successful.");
+            return response.json();
+        })
+        .then((json) => {
+            debug("json:", json);
+            // Perform basic data validation on the json object
+            if (json.hasOwnProperty('error')) throw new Error("API Error: " + json.error);
+            if (!json.hasOwnProperty('results')) throw new Error("Received malformed response from API.");
+            displayPersona(json.results[0]);
+        })
+        .catch((err) => {
+            error(err);
+        })
+        .finally(() => {
+            // Unlock the button
+            button.removeAttribute('disabled');
+            button.innerText = backupText;
+            button.ariaBusy = false;
+        });
 });
